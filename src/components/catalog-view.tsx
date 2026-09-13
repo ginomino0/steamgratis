@@ -34,17 +34,34 @@ export function CatalogView({ catalog }: CatalogViewProps) {
   const [refreshing, setRefreshing] = useState(false);
   const [visible, setVisible] = useState(16);
 
+  // I giochi già presi non stanno più tra "Tutti / A tempo / Nuovi": si vedono
+  // solo nella sezione "Presi", così l'elenco principale resta corto.
+  const unclaimedAll = useMemo(
+    () => catalog.all.filter((game) => !claimed.has(game.id)),
+    [catalog.all, claimed],
+  );
+  const unclaimedLimited = useMemo(
+    () => catalog.limited.filter((game) => !claimed.has(game.id)),
+    [catalog.limited, claimed],
+  );
+  const unclaimedRecent = useMemo(
+    () => catalog.recent.filter((game) => !claimed.has(game.id)),
+    [catalog.recent, claimed],
+  );
+  const claimedList = useMemo(
+    () => catalog.all.filter((game) => claimed.has(game.id)),
+    [catalog.all, claimed],
+  );
+
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
-    let list: CatalogGame[] = catalog.all;
-    if (filter === "limited") list = catalog.limited;
-    else if (filter === "new") list = catalog.recent;
-    else if (filter === "claimed") {
-      list = catalog.all.filter((game) => claimed.has(game.id));
-    }
+    let list: CatalogGame[] = unclaimedAll;
+    if (filter === "limited") list = unclaimedLimited;
+    else if (filter === "new") list = unclaimedRecent;
+    else if (filter === "claimed") list = claimedList;
     if (!q) return list;
     return list.filter((game) => game.title.toLowerCase().includes(q));
-  }, [catalog, filter, query, claimed]);
+  }, [filter, query, unclaimedAll, unclaimedLimited, unclaimedRecent, claimedList]);
 
   const shown = query ? filtered : filtered.slice(0, visible);
 
@@ -90,9 +107,9 @@ export function CatalogView({ catalog }: CatalogViewProps) {
 
       <section className="px-4 pt-5">
         <div className="grid grid-cols-3 gap-2">
-          <Stat label="Da prendere" value={catalog.all.length} />
-          <Stat label="A tempo" value={catalog.limited.length} />
-          <Stat label="Nuove uscite" value={catalog.recent.length} />
+          <Stat label="Tutti" value={unclaimedAll.length} />
+          <Stat label="Presi" value={claimedList.length} />
+          <Stat label="Nuove uscite" value={unclaimedRecent.length} />
         </div>
         <p className="mt-3 text-xs tabular-nums text-faint">{updatedLabel(catalog.generatedAt)}</p>
         {catalog.error ? (
@@ -100,7 +117,7 @@ export function CatalogView({ catalog }: CatalogViewProps) {
             {catalog.error}
           </p>
         ) : null}
-        {catalog.limited.length > 0 ? (
+        {unclaimedLimited.length > 0 ? (
           <button
             type="button"
             onClick={() => {
@@ -110,9 +127,9 @@ export function CatalogView({ catalog }: CatalogViewProps) {
             className="mt-3 flex w-full items-center justify-between rounded-2xl bg-elevated px-4 py-3 text-left shadow-[var(--shadow-border)]"
           >
             <span className="text-sm text-fg">
-              <span className="font-semibold tabular-nums text-warn">{catalog.limited.length}</span>
+              <span className="font-semibold tabular-nums text-warn">{unclaimedLimited.length}</span>
               {" "}
-              {catalog.limited.length === 1
+              {unclaimedLimited.length === 1
                 ? "titolo gratis a tempo"
                 : "titoli gratis a tempo"}
             </span>

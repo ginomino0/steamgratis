@@ -58,8 +58,6 @@ export function CatalogView({ catalog }: CatalogViewProps) {
     }
   }
 
-  const featured = catalog.limited[0] ?? null;
-
   return (
     <div className="mx-auto min-h-dvh w-full max-w-3xl pb-10">
       <header className="sticky top-0 z-30 border-b border-border bg-bg/85 px-4 pb-3 pt-[max(12px,env(safe-area-inset-top))] backdrop-blur-md">
@@ -165,19 +163,11 @@ export function CatalogView({ catalog }: CatalogViewProps) {
         </div>
       </div>
 
-      <section className="mt-4 flex flex-col gap-4 px-4">
-        {filter === "all" && featured && !query ? (
-          <GameCard game={featured} featured onOpen={setSelected} />
-        ) : null}
-
+      <section className="mt-4 flex flex-col gap-2 px-4">
         {filtered.length === 0 ? (
           <EmptyState filter={filter} query={query} />
         ) : (
-          shown
-            .filter((game) => !(filter === "all" && !query && featured && game.id === featured.id))
-            .map((game) => (
-              <GameCard key={game.id} game={game} onOpen={setSelected} />
-            ))
+          shown.map((game) => <GameCard key={game.id} game={game} onOpen={setSelected} />)
         )}
 
         {!query && filtered.length > visible ? (
@@ -254,10 +244,12 @@ export function CatalogSkeleton() {
         <Skeleton className="h-16" />
         <Skeleton className="h-16" />
       </div>
-      <div className="mt-6 space-y-4">
-        <Skeleton className="h-52 w-full rounded-xl" />
-        <Skeleton className="h-52 w-full rounded-xl" />
-        <Skeleton className="h-52 w-full rounded-xl" />
+      <div className="mt-6 space-y-2">
+        <Skeleton className="h-[72px] w-full rounded-xl" />
+        <Skeleton className="h-[72px] w-full rounded-xl" />
+        <Skeleton className="h-[72px] w-full rounded-xl" />
+        <Skeleton className="h-[72px] w-full rounded-xl" />
+        <Skeleton className="h-[72px] w-full rounded-xl" />
       </div>
     </div>
   );

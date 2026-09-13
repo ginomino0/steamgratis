@@ -1,0 +1,17 @@
+{
+  "name": "SteamGratis",
+  "short_name": "SteamGratis",
+  "description": "Trova i giochi Steam gratis e le promozioni a tempo.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0a0d11",
+  "theme_color": "#0a0d11",
+  "icons": [
+    {
+      "src": "/icon-180.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
